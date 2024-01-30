@@ -1,0 +1,54 @@
+---
+title: "STAT 641 HW 1"
+author: "Jack Cunningham"
+format: html
+editor: visual
+---
+
+## Homework 1
+
+1\)
+
+a.   Since n is extremely large and p is small we would expect a more flexible approach to be better than an inflexible method. The high amount of observations help alleviate the risk of following the random error too closely. The small amount of predictors allows to avoid the curse of dimensionality, it is easier to gather nearby points that share properties in order to inform future predictions.
+
+b.   We would expect the performance of a flexible method to do worse than an inflexible method in this case. With a small amount of observations combined with the fact we have many predictors we are likely to see over fitting become a problem in the flexible method.
+
+c.  A flexible method will do better than an inflexible method in this case, it is more capable of capturing the true shape of f. An inflexible method would introduce a significant amount of bias.
+
+d.  A flexible method will suffer and do worse than an inflexible method in this case. The more flexible a method gets the more it tries to fit the data, in an application where the variance of error is high a flexible method will be picking up a lot of noise from the data.
+
+2\)
+
+a.  This is a regression problem, our response variable is CEO salary which is a quantitative value. We state we are interested in what factors impact salary thus this is an inference problem. n = 500 and p = 3.
+
+b.  This is a classification problem, our response variable is the result of the product which is qualitative with two possibilities, success or failure. We are interested in whether our product will be a success therefore this is a prediction problem. n = 20 and p = 13.
+
+c.  This is a regression problem, our response variable is the percentage change in USD/Euro rates which is a quantitative value. This is a prediction problem. n = 52 and p = 3.
+
+3\)
+
+a.  
+
+    ```{r}
+    college <- read.csv("College.csv")
+
+    ```
+
+b.  
+
+    ```{r}
+    rownames(college) <- college[, 1]
+    college <- college[, -1]
+    View(college)
+    ```
+
+c.  
+
+    ```{r}
+    college$Private <- as.factor(college$Private)
+    pairs(college[, 1:10])
+    ```
+
+```{r}
+plot(college$Private, college$Outstate, col = "maroon", xlab = "Private", ylab = "Out of State Students" )
+```
