@@ -3,15 +3,16 @@ title: "STAT 641 HW 1"
 author: "Jack Cunningham"
 format: html
 editor: visual
+engine: knitr
 ---
 
 ## Homework 1
 
 1\)
 
-a.   Since n is extremely large and p is small we would expect a more flexible approach to be better than an inflexible method. The high amount of observations help alleviate the risk of following the random error too closely. The small amount of predictors allows to avoid the curse of dimensionality, it is easier to gather nearby points that share properties in order to inform future predictions.
+a.  Since n is extremely large and p is small we would expect a more flexible approach to be better than an inflexible method. The high amount of observations help alleviate the risk of following the random error too closely. The small amount of predictors allows to avoid the curse of dimensionality, it is easier to gather nearby points that share properties in order to inform future predictions.
 
-b.   We would expect the performance of a flexible method to do worse than an inflexible method in this case. With a small amount of observations combined with the fact we have many predictors we are likely to see over fitting become a problem in the flexible method.
+b.  We would expect the performance of a flexible method to do worse than an inflexible method in this case. With a small amount of observations combined with the fact we have many predictors we are likely to see over fitting become a problem in the flexible method.
 
 c.  A flexible method will do better than an inflexible method in this case, it is more capable of capturing the true shape of f. An inflexible method would introduce a significant amount of bias.
 
@@ -39,16 +40,177 @@ b.
     ```{r}
     rownames(college) <- college[, 1]
     college <- college[, -1]
-    View(college)
     ```
 
 c.  
 
     ```{r}
-    college$Private <- as.factor(college$Private)
-    pairs(college[, 1:10])
+    summary(college)
     ```
 
 ```{r}
-plot(college$Private, college$Outstate, col = "maroon", xlab = "Private", ylab = "Out of State Students" )
+college$Private <- as.factor(college$Private)
+pairs(college[,1:10])
 ```
+
+```{r}
+plot(college$Private,college$Outstate, col = "maroon", xlab = "Private", ylab = "Out of state tuiton")
+```
+
+```{r}
+Elite <- rep("No", nrow(college))
+Elite[college$Top10perc > 50] <- "Yes"
+Elite <- as.factor(Elite)
+college <- data.frame(college, Elite)
+```
+
+```{r}
+summary(college$Elite)
+```
+
+```{r}
+plot(x = college$Elite, y = college$Outstate, xlab = "Elite", ylab = "Out of state tuiton", col = "blue")
+```
+
+```{r}
+hist(college$PhD, breaks = 15, col = "pink")
+```
+
+```{r}
+hist(college$Grad.Rate, breaks = 20, col = "green")
+```
+
+```{r}
+hist(college$Apps)
+hist(college$Expend)
+hist(college$perc.alumni)
+hist(college$Books)
+par(mfrow = c(2, 2))
+```
+
+4\.
+
+```{r}
+require(ISLR2)
+?Boston
+```
+
+a\) There are 506 rows and 13 columns. Each row is an observation of a Boston Suburb and each column is a measurement of the suburb (i.e. crime rate).
+
+b\)
+
+```{r}
+pairs(Boston[,1:5])
+```
+
+A few findings we can point out:
+
+In areas with low industry have high amounts of residential land are zoned. This makes sense, I'd imagine the majority of industry are in areas close to the city. The further you get the more space there is to set aside large lots of land to live in.
+
+We can also see that in areas with low residential zoning there appears to be high amounts of crime, furthering the idea those areas are closer to the city.
+
+c\)
+
+```{r}
+pairs(crim ~ lstat + tax + medv + dis, data = Boston)
+```
+
+Crime appears to be lower in areas with higher median value homes. More affluent areas seem to not have the high amount of crime that less desirable areas do. But this could be due to theses houses being on larger plots of land and naturally people being further apart.
+
+```{r}
+plot(Boston$zn, Boston$medv)
+```
+
+It is hard to tell due to the high density of suburbs having a proportion of 0 for this residential land but there doesn't appear to be a strong relationship between median value of houses in a suburb and proportion of large plots of residential land. So it seems the more affluent the area the less crime there is.
+
+```{r}
+plot(Boston$nox, Boston$crim)
+```
+
+We can see here that crime appears to be more prevalent in areas with high nitrogen oxide concentration, indicating that crime occurs more in areas where high amounts of people/industry is.
+
+```{r}
+plot(Boston$lstat, Boston$crim)
+```
+
+In areas with very few low status rates crime is low, in poorer areas crime begins to become a problem.
+
+d\)
+
+```{r}
+plot(Boston$crim)
+```
+
+We can see that the observations from 350-490 have higher crime than the rest of the observations.
+
+```{r}
+summary(Boston$crim)
+```
+
+We can see the range of crime rate goes from nearly 0 to 89. We can also see that the vast amount of suburbs have relatively low crime rates.
+
+```{r}
+plot(Boston$tax)
+```
+
+That same range that had high crime appear to also have the highest property taxes.
+
+```{r}
+summary(Boston$tax)
+```
+
+The range of property tax rates is 187 per \$10,000 to 711 per \$10,000.
+
+```{r}
+plot(Boston$ptratio)
+```
+
+We see here that same range have the same pupil teacher ratio which is relatively high, perhaps this set of suburbs have strict rules on their pupil-teacher ratio.
+
+There is also a small set with a rather low ratio of 13.
+
+```{r}
+summary(Boston$ptratio)
+```
+
+The range of the pupil teacher ratio is 12.60 to 22.00.
+
+e\)
+
+```{r}
+sum(Boston$chas)
+```
+
+There are 35 suburbs who border the Charles river.
+
+f\)
+
+```{r}
+median(Boston$ptratio)
+```
+
+The median pupil teacher ratio is 19.05.
+
+g\)
+
+```{r}
+Boston[order(Boston$medv),]
+```
+
+We can see that the two suburbs that share the lowest median value of owner-occupied homes are index #399 and 406.
+
+```{r}
+Boston[c(399, 406),]
+```
+
+```{r}
+summary(Boston$crim)
+```
+
+The crime for 399 and 406 are both high crime areas compared to regular Boston suburb.
+
+```{r}
+summary(Boston$zn)
+```
+
+There is no
