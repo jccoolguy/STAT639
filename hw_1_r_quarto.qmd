@@ -8,6 +8,11 @@ engine: knitr
 
 ## Homework 1
 
+```{r}
+require(tidyverse)
+require(ISLR2)
+```
+
 1\)
 
 a.  Since n is extremely large and p is small we would expect a more flexible approach to be better than an inflexible method. The high amount of observations help alleviate the risk of following the random error too closely. The small amount of predictors allows to avoid the curse of dimensionality, it is easier to gather nearby points that share properties in order to inform future predictions.
@@ -91,7 +96,6 @@ par(mfrow = c(2, 2))
 4\.
 
 ```{r}
-require(ISLR2)
 ?Boston
 ```
 
@@ -203,14 +207,69 @@ We can see that the two suburbs that share the lowest median value of owner-occu
 Boston[c(399, 406),]
 ```
 
-```{r}
-summary(Boston$crim)
-```
-
-The crime for 399 and 406 are both high crime areas compared to regular Boston suburb.
+Quickly taking mean of all the other suburbs to compare values and calculating the percentile of each feature for our two standout suburbs.
 
 ```{r}
-summary(Boston$zn)
+Boston|>
+  slice(-c(399,406)) |> 
+  summarise(across(where(is.numeric), mean))
 ```
 
-There is no
+```{r}
+Boston |> 
+  summarise(across(where(is.numeric), percent_rank)) |> 
+  slice(c(399, 406))
+```
+
+We can see that the crime of these two suburbs are much higher than the average of others, in the top two percentile of suburbs.
+
+There is no zoning for large residential land.
+
+There is slightly more industry than average.
+
+They do not border Charles river.
+
+The nitrogen level is quite a bit higher than others.
+
+The average rooms per dwelling is a lot lower than the mean.
+
+All owner-occupied units were built before 1940.
+
+They are closer to Boston employment centers.
+
+They are closer to highways.
+
+Property tax value is higher.
+
+The pupil-teacher ratio is higher.
+
+They have an extremely high rate of lower status individuals.
+
+h\)
+
+```{r}
+Boston |> 
+  filter(rm > 7) |> 
+  summarize(n = n())
+```
+
+There are 64 rows with an average of 7 rooms or more.
+
+```{r}
+Boston |> 
+  filter(rm > 8) |> 
+  summarize(n = n())
+```
+
+There are 13 suburbs with an average of 8 rooms or more.
+
+```{r}
+Boston |> 
+  mutate(many_rooms = rm > 8) |> 
+  group_by(many_rooms) |> 
+  summarise(across(where(is.numeric), mean))
+```
+
+One can investigate any particular differences they find interesting, a few of mine:
+
+We can see the extremely low crime rate of these suburbs, the low pupil-teacher ratio, the extremely low ratio of lower-class individuals and the extremely valuable houses.
