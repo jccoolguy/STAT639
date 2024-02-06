@@ -1,7 +1,12 @@
 ---
 title: "STAT 641 HW 1"
-author: "Jack Cunningham"
-format: html
+author: "Jack Cunningham (jgavc@tamu.edu)"
+date: 02/06/2024
+date-format: short
+format:
+  pdf:
+    documentclass: scrartcl
+    papersize: letter
 editor: visual
 engine: knitr
 ---
@@ -198,7 +203,7 @@ The median pupil teacher ratio is 19.05.
 g\)
 
 ```{r}
-Boston[order(Boston$medv),]
+Boston[order(Boston$medv)[1:5], ]
 ```
 
 We can see that the two suburbs that share the lowest median value of owner-occupied homes are index #399 and 406.
