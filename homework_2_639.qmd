@@ -1,0 +1,54 @@
+---
+title: "STAT 641 HW 1"
+author: "Jack Cunningham (jgavc@tamu.edu)"
+date: 02/06/2024
+date-format: short
+format:
+  pdf:
+    documentclass: scrartcl
+    papersize: letter
+editor: visual
+engine: knitr
+---
+
+## Homework 2
+
+1\)
+
+We are tasked to show that the logistic function representation and logit representation for the logistic regression model are equivalent:
+
+$$
+p(X) = \frac{e^{\beta_0+\beta_1 X}}{1+e^{\beta_0+\beta_1 X}}
+$$
+
+Manipulating numerator and denominator on right side:
+
+$$
+p(X) = (1 + e^{\beta_0+\beta_1 X})p(X)\frac{1}{e^{\beta_0 + \beta_1 X}}p(X)
+$$
+
+$$
+p(X) = p(X)(\frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}})
+$$
+
+Dividing both sides by $p(X)$.
+
+$$
+1 = 
+\frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}}
+ 
+$$
+
+$$
+e^{\beta_0 + \beta_1 X} - e^{\beta_0 + \beta_1 X}p(X) = p(X)
+$$
+
+Factoring left side:
+
+$$
+e^{\beta_0 + \beta_1 X}(1 - p(X)) = p(X)
+$$
+
+$$
+\frac{p(X)}{1-p(X)} = e^{\beta_0 + \beta_1 X}
+$$
