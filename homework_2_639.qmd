@@ -52,3 +52,27 @@ $$
 $$
 \frac{p(X)}{1-p(X)} = e^{\beta_0 + \beta_1 X}
 $$
+
+2\)
+
+a\) We will use $1/10$ of the available observations since we are looking at observations within $10\%$ of our chosen X.
+
+b\) We have $(X_1, X_2)$ uniformly distributed on $[0,1] \times[0,1]$. Since we want to look at observations within $10\%$ on both $X_1$ and $X_2$ we are left with a fraction of: $(\frac{1}{10})(\frac{1}{10}) = \frac{1}{100}$ .
+
+c\) Extending our previous answer, with $p = 100$ we will only use $(\frac{1}{10})^{100}$ of the available observations.
+
+d\) As p increases the fraction of observations within a given range is extremely small this leads us to either extend our range to find "like" observations or be left with very few observations that drive our prediction.
+
+e\) If we want to use, on average, $10\%$ of our training observations to inform a prediction on a test observation we can treat the space utilized as a hyper-cube. The hyper-cube then has a volume of 0.1.
+
+The function for the volume of a hyper-cube is $(x)^n$ where $x$ is the length of each equal side and n is the number of sides.
+
+Our objective is to solve for the length of each side, so $x = V^{1/n}$ where V is the volume.
+
+For $p=1$ we have a length of $x = (.1)^{1}=.1$.
+
+For $p=2$ we have a length of $x = (.1)^{1/2}=.3162278$
+
+For $p=100$ we have a length of $x = (.1)^{1/100}=.9772372$
+
+As p increases in order to get a certain amount of nearby values we need extend the range of acceptable values in each predictor. We can see that at high p, such as 100, the range for each predictor is .9772. This causes concern as the nearby values aren't nearby at all!
