@@ -33,11 +33,9 @@ $$
 
 Dividing both sides by $p(X)$.
 
-$$
-1 = 
-\frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}}
- 
-$$
+\$\$ 1 = \frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}}
+
+\$\$
 
 $$
 e^{\beta_0 + \beta_1 X} - e^{\beta_0 + \beta_1 X}p(X) = p(X)
@@ -75,4 +73,18 @@ For $p=2$ we have a length of $x = (.1)^{1/2}=.3162278$
 
 For $p=100$ we have a length of $x = (.1)^{1/100}=.9772372$
 
-As p increases in order to get a certain amount of nearby values we need extend the range of acceptable values in each predictor. We can see that at high p, such as 100, the range for each predictor is .9772. This causes concern as the nearby values aren't nearby at all!
+As p increases in order to get a certain amount of nearby values we need extend the range of acceptable values in each predictor. We can see that at high p, such as 100, the range for each predictor is .9772. This causes concern as the nearby values aren't nearby at all.
+
+3\)
+
+We are given a training data set and apply two classification procedures:
+
+1.  Logistic regression with an error rate of 20% on training data and 30% on test data.
+
+2.  1-nearest neighbors with an average error rate of 18% on training and test data.
+
+With the information we are given the test error is the best metric for assessing model performance. In order to compare the performance of the two methods we need to obtain the test error rate of 1-nearest neighbors.
+
+The nature of 1-nearest neighbors is assigning an observation to its closest observation. After the model is trained and we ask it to classify an already seen observation it will guess the correct class every time. Therefore the training error for 1-nearest neighbors will be 0%. Since we are given the average error rate of 18% we can easily find the test error rate, 36%.
+
+We would choose logistic regression in this case as it has a lower error rate than 1-nearest neighbors.
