@@ -88,3 +88,291 @@ With the information we are given the test error is the best metric for assessin
 The nature of 1-nearest neighbors is assigning an observation to its closest observation. After the model is trained and we ask it to classify an already seen observation it will guess the correct class every time. Therefore the training error for 1-nearest neighbors will be 0%. Since we are given the average error rate of 18% we can easily find the test error rate, 36%.
 
 We would choose logistic regression in this case as it has a lower error rate than 1-nearest neighbors.
+
+4\)
+
+```{r}
+require(ISLR2)
+require(tidyverse)
+```
+
+```{r}
+Auto_mpg <- Auto |> 
+  mutate(mpg01 = ifelse(mpg > median(mpg), 1, 0)) |> 
+  mutate(cylinders = as.factor(cylinders)) |> 
+  mutate(origin = as.factor(origin))
+```
+
+```{r}
+Auto_mpg |> 
+  ggplot(aes(x = cylinders, fill = mpg01)) +
+  geom_bar(position = "fill") +
+  labs(x = "Number of Cylinders",
+       y = "Proportion of mpg01")
+```
+
+We can see that the number of cylinders appears to have a high impact on whether the mpg is above the median. Let's investigate the number of cars for each cylinder.
+
+```{r}
+Auto_mpg |> 
+  count(cylinders)
+```
+
+We can see now that the amount of cars are not equally distributed across the different cylinders. Therefore thinking back to our previous graph, let us disregard cylinders 3 and 5 due to their extremely low occurrences.
+
+```{r}
+Auto_mpg |> 
+  filter(cylinders == c(4, 6, 8)) |> 
+  ggplot(aes(x = cylinders, fill = mpg01)) + 
+  geom_bar(position = "fill") +  
+  labs(x = "Number of Cylinders (Excluding 3, 5)",
+       y = "Proportion of mpg01",)
+```
+
+Now we can see that the number of cylinders appear to be very related to whether a car is above the median MPG, the lower the cylinder the higher the mpg.
+
+Let's now take a look at the relationship of mpg and the year of the car.
+
+```{r}
+Auto_mpg |> 
+  ggplot(aes(x = year, y = mpg)) +
+  geom_boxplot(aes(group = year)) +
+  geom_hline(aes(yintercept = median(mpg)), col = "red") +
+  labs(
+    x = "Year",
+    y = "MPG"
+  )
+```
+
+Here we can see that there is a positive correlation between year and miles per gallon. The red line is the median of mpg, we can see that those later years have samples almost entirely above the median. From this we can gather that year seems to be a useful feature to predict mpg01.
+
+```{r}
+Auto_mpg |>
+  ggplot(aes(x = mpg01, y = displacement)) +
+  geom_boxplot()
+  
+```
+
+The engine displacement also appears to have a large impact on whether the mpg is above or below the median, there appears to be large separation between the two classes on this feature. There is a high chance that the displacement feature is related to horsepower, let's investigate that.
+
+```{r}
+Auto_mpg |> 
+  ggplot(aes(x = horsepower, y = displacement)) +
+  geom_point(aes(color = mpg01))
+```
+
+Here we can see that horsepower and displacement are closely related and the vehicles with above median mpg are low in both.
+
+Let's see the relationship between weight and mpg_01.
+
+```{r}
+Auto_mpg |> 
+  ggplot(aes(x = mpg01, y = weight)) + 
+  geom_boxplot()
+```
+
+There also appears to be a relationship between mpg01 and the weight of the vehicle.
+
+It is also worth taking a look to see whether the origin of the vehicle has an impact on the mpg of the vehicle. But it is also worth controlling for the type of vehicle created by the regions.
+
+Let's use the number of cylinders of the car as a way of digging into how the origin affects the mpg of the vehicle.
+
+```{r}
+Auto_mpg |>
+  filter(cylinders == c(4,6,8)) |> 
+  ggplot(aes(x = origin, fill = mpg01)) + 
+  geom_bar() +
+  scale_x_discrete(labels = c("1" = "AMER", "2" = "EUR", "3" = "JPN")) +
+  facet_wrap(~cylinders)
+```
+
+Here we can see that Japan and Europe almost entirely create cars with 4 cylinders. America creates the most cars in the data set as well as nearly all the 6 and 8 cylinder cars.
+
+From this we can see that it is hard to parse out the impact of the origin of the car after also controlling for the cylinders of the cars created.
+
+An overall takeaway from this analysis is that MPG01 appears to have a strong relationship with nearly every feature but many features are correlated strongly with each other. Say horsepower and engine displacement or origin and cylinder. There is also high separation in the distribution of features for the two different classes. An example of this would be in weight and displacement.
+
+If we were to predict which methodology will do best for classifying here, I'd say it will likely be LDA and QDA. Logistic regression will suffer from the separation in each class being high. Naive Bayes makes the assumption that features within a class are independent of each other, that will clearly be violated and performance will greatly suffer as a result. K-nearest-neighbors will not do great due to N not being high relative to the number of predictors.
+
+c\)
+
+```{r}
+require(tidymodels)
+
+set.seed(50)
+auto_split <- initial_split(Auto_mpg, prop = 0.75)
+auto_train_data <- training(auto_split)
+auto_test_data <- testing(auto_split)
+
+mpg01_test <- auto_test_data$mpg01
+```
+
+d)\
+
+```{r}
+library(MASS)
+auto_lda_fit <- lda(
+  mpg01 ~ cylinders + displacement + horsepower + weight + acceleration + year,
+  data = auto_train_data)
+auto_lda_fit
+```
+
+```{r}
+auto_lda_pred <- predict(auto_lda_fit, auto_test_data, type = "response")
+auto_lda_pred_class <- auto_lda_pred$class
+
+table(auto_lda_pred_class, mpg01_test)
+```
+
+We can calculate the error rate:
+
+```{r}
+mean(auto_lda_pred_class!=mpg01_test)
+```
+
+e\)
+
+```{r}
+auto_qda_fit <- qda(
+    mpg01 ~ displacement + horsepower + weight + acceleration + year,
+  data = auto_train_data
+)
+auto_qda_fit
+```
+
+```{r}
+auto_qda_pred_class <- predict(auto_qda_fit, auto_test_data)$class
+table(auto_qda_pred_class, mpg01_test)
+```
+
+We can calculate the error rate:
+
+```{r}
+mean(auto_qda_pred_class!=mpg01_test)
+```
+
+f\)
+
+```{r}
+auto_logistic_fits <- glm(
+  mpg01 ~ cylinders + displacement + horsepower + weight + acceleration + year,
+  family = binomial,
+  data = auto_train_data
+)
+summary(auto_logistic_fits)
+```
+
+```{r}
+auto_logistic_probs <- predict(auto_logistic_fits, auto_test_data, type = "response")
+```
+
+```{r}
+auto_logistic_pred <- rep(FALSE, 98)
+auto_logistic_pred[auto_logistic_probs > .5] <- TRUE
+table(auto_logistic_pred, mpg01_test)
+```
+
+We can calculate the error rate:
+
+```{r}
+mean(auto_logistic_pred != mpg01_test)
+```
+
+```{r}
+require(e1071)
+auto_nb_fit <- naiveBayes(
+  mpg01 ~ cylinders + displacement + horsepower + weight + acceleration + year,
+  data = auto_train_data
+)
+auto_nb_fit
+```
+
+```{r}
+auto_nb_pred <- predict(auto_nb_fit, auto_test_data)
+table(auto_nb_pred, mpg01_test)
+```
+
+We can calculate the error rate below:
+
+```{r}
+mean(auto_nb_pred != mpg01_test)
+```
+
+h\)
+
+```{r}
+library(class)
+auto_train_x = auto_train_data |> 
+  dplyr::select(cylinders, displacement, horsepower, weight, acceleration, year)
+
+auto_test_x = auto_test_data |> 
+  dplyr::select(cylinders, displacement, horsepower, weight, acceleration, year)
+
+auto_train_mpg01 = auto_train_data |> 
+  dplyr::select(mpg01)
+```
+
+```{r}
+auto_knn_pred_1 <- knn(train = auto_train_x, 
+                       test = auto_test_x, 
+                       cl = auto_train_data$mpg01, 
+                       k = 1)
+table(auto_knn_pred_1, mpg01_test)
+```
+
+We can calculate error:
+
+```{r}
+mean(auto_knn_pred_1 != mpg01_test)
+```
+
+Lets try again with k = 5:
+
+```{r}
+auto_knn_pred_5 <- knn(train = auto_train_x, 
+                       test = auto_test_x, 
+                       cl = auto_train_data$mpg01, 
+                       k = 5)
+table(auto_knn_pred_5, mpg01_test)
+```
+
+We can calculate error:
+
+```{r}
+mean(auto_knn_pred_5 != mpg01_test)
+```
+
+Lets try again with k = 10:
+
+```{r}
+auto_knn_pred_10 <- knn(train = auto_train_x, 
+                       test = auto_test_x, 
+                       cl = auto_train_data$mpg01, 
+                       k = 10)
+table(auto_knn_pred_10, mpg01_test)
+```
+
+We can calculate error:
+
+```{r}
+mean(auto_knn_pred_10 != mpg01_test)
+```
+
+Now lets try with an extremely large k, k = 50.
+
+```{r}
+auto_knn_pred_50 <- knn(train = auto_train_x, 
+                       test = auto_test_x, 
+                       cl = auto_train_data$mpg01, 
+                       k = 50)
+table(auto_knn_pred_50, mpg01_test)
+```
+
+We can calculate error:
+
+```{r}
+mean(auto_knn_pred_50 != mpg01_test)
+  
+```
+
+From the four K's we tested K = 5 appears to have done the best. There seems to be a sweet-spot between low and high values of k that allow for the best performance of the KNN model. This tracks with our previous understanding of the trade-offs of bias and variance, the point where both are minimized with likely not be with low ks or extremely high ks.
