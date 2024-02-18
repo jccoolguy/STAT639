@@ -376,3 +376,33 @@ mean(auto_knn_pred_50 != mpg01_test)
 ```
 
 From the four K's we tested K = 5 appears to have done the best. There seems to be a sweet-spot between low and high values of k that allow for the best performance of the KNN model. This tracks with our previous understanding of the trade-offs of bias and variance, the point where both are minimized with likely not be with low ks or extremely high ks.
+
+5\)
+
+```{r}
+toy_svm_df <- tribble(
+  ~Obs, ~X1, ~X2, ~Y,
+  1,     3,   4,  "Red",
+  2,     2,   2,  "Red",
+  3,     4,   4,  "Red",
+  4,     1,   4,  "Red",
+  5,     2,   1,  "Blue",
+  6,     4,   3,  "Blue",
+  7,     4,   1,  "Blue"
+  
+)
+```
+
+a\)
+
+```{r}
+observations <- toy_svm_df |> 
+  ggplot(aes(x = X1, y = X2, color = Y)) +
+  geom_point() +
+  scale_color_manual(values = c("Red" = "red", "Blue" = "blue"))
+observations
+```
+
+```{r}
+
+```
