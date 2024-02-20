@@ -413,7 +413,7 @@ optimal_seper_classifier
 
 c\)
 
-The equation of our optimal separating hyper-plane is $-.5 + 1 X_1 + 1 X_2=0$. So our classification rule is red if $-.5 + 1 X_1 + 1 X_2 > 0$ and blue if $-.5 + 1 X_1 + 1 X_2<0$.
+The equation of our optimal separating hyper-plane is $-.5 + 1 X_1 -1 X_2=0$. So our classification rule is red if $-.5 + 1 X_1 - 1 X_2 > 0$ and blue if $-.5 + 1 X_1 - 1 X_2<0$.
 
 d\)
 
