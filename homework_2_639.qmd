@@ -1,7 +1,7 @@
 ---
-title: "STAT 641 HW 1"
+title: "STAT 639 HW 2"
 author: "Jack Cunningham (jgavc@tamu.edu)"
-date: 02/06/2024
+date: 02/20/2024
 date-format: short
 format:
   pdf:
@@ -33,9 +33,9 @@ $$
 
 Dividing both sides by $p(X)$.
 
-\$\$ 1 = \frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}}
-
-\$\$
+$$
+1 = \frac{p(X)+e^{\beta_0 + \beta_1 X}p(X)}{e^{\beta_0 + \beta_1 X}}
+$$
 
 $$
 e^{\beta_0 + \beta_1 X} - e^{\beta_0 + \beta_1 X}p(X) = p(X)
@@ -91,14 +91,14 @@ We would choose logistic regression in this case as it has a lower error rate th
 
 4\)
 
-```{r}
+```{r message=FALSE}
 require(ISLR2)
 require(tidyverse)
 ```
 
 ```{r}
 Auto_mpg <- Auto |> 
-  mutate(mpg01 = ifelse(mpg > median(mpg), 1, 0)) |> 
+  mutate(mpg01 = as.factor(ifelse(mpg > median(mpg), 1, 0))) |> 
   mutate(cylinders = as.factor(cylinders)) |> 
   mutate(origin = as.factor(origin))
 ```
@@ -106,23 +106,18 @@ Auto_mpg <- Auto |>
 ```{r}
 Auto_mpg |> 
   ggplot(aes(x = cylinders, fill = mpg01)) +
-  geom_bar(position = "fill") +
+  geom_bar() +
   labs(x = "Number of Cylinders",
-       y = "Proportion of mpg01")
+       y = "Cars")
 ```
 
-We can see that the number of cylinders appears to have a high impact on whether the mpg is above the median. Let's investigate the number of cars for each cylinder.
+We can see that the number of cylinders appears to have a high impact on whether the mpg is above the median. We also see that the different cylinder cars are not equal, there are many 4-cylinder cars while very few 3 and 5 cylinder cars.
+
+Therefore thinking back to our previous graph, let us disregard cylinders 3 and 5 due to their extremely low occurrences and compare the rates of MPG01.
 
 ```{r}
 Auto_mpg |> 
-  count(cylinders)
-```
-
-We can see now that the amount of cars are not equally distributed across the different cylinders. Therefore thinking back to our previous graph, let us disregard cylinders 3 and 5 due to their extremely low occurrences.
-
-```{r}
-Auto_mpg |> 
-  filter(cylinders == c(4, 6, 8)) |> 
+  filter(cylinders %in% c(4, 6, 8)) |> 
   ggplot(aes(x = cylinders, fill = mpg01)) + 
   geom_bar(position = "fill") +  
   labs(x = "Number of Cylinders (Excluding 3, 5)",
@@ -179,7 +174,7 @@ Let's use the number of cylinders of the car as a way of digging into how the or
 
 ```{r}
 Auto_mpg |>
-  filter(cylinders == c(4,6,8)) |> 
+  filter(cylinders %in% c(4,6,8)) |> 
   ggplot(aes(x = origin, fill = mpg01)) + 
   geom_bar() +
   scale_x_discrete(labels = c("1" = "AMER", "2" = "EUR", "3" = "JPN")) +
@@ -192,11 +187,9 @@ From this we can see that it is hard to parse out the impact of the origin of th
 
 An overall takeaway from this analysis is that MPG01 appears to have a strong relationship with nearly every feature but many features are correlated strongly with each other. Say horsepower and engine displacement or origin and cylinder. There is also high separation in the distribution of features for the two different classes. An example of this would be in weight and displacement.
 
-If we were to predict which methodology will do best for classifying here, I'd say it will likely be LDA and QDA. Logistic regression will suffer from the separation in each class being high. Naive Bayes makes the assumption that features within a class are independent of each other, that will clearly be violated and performance will greatly suffer as a result. K-nearest-neighbors will not do great due to N not being high relative to the number of predictors.
-
 c\)
 
-```{r}
+```{r message  = FALSE}
 require(tidymodels)
 
 set.seed(50)
@@ -209,7 +202,7 @@ mpg01_test <- auto_test_data$mpg01
 
 d)\
 
-```{r}
+```{r message=FALSE}
 library(MASS)
 auto_lda_fit <- lda(
   mpg01 ~ cylinders + displacement + horsepower + weight + acceleration + year,
@@ -278,7 +271,7 @@ We can calculate the error rate:
 mean(auto_logistic_pred != mpg01_test)
 ```
 
-```{r}
+```{r message = FALSE}
 require(e1071)
 auto_nb_fit <- naiveBayes(
   mpg01 ~ cylinders + displacement + horsepower + weight + acceleration + year,
@@ -391,6 +384,9 @@ toy_svm_df <- tribble(
   7,     4,   1,  "Blue"
   
 )
+
+toy_svm_df <- toy_svm_df |> 
+  mutate(Y = as.factor(Y))
 ```
 
 a\)
@@ -399,10 +395,39 @@ a\)
 observations <- toy_svm_df |> 
   ggplot(aes(x = X1, y = X2, color = Y)) +
   geom_point() +
-  scale_color_manual(values = c("Red" = "red", "Blue" = "blue"))
+  scale_color_manual(values = c("Red" = "red", "Blue" = "blue")) +
+  scale_x_continuous(limits = c(0, 5)) +
+  scale_y_continuous(limits = c(0, 5))
 observations
 ```
 
-```{r}
+b\)
 
+We can find the optimal line by inspection, using the closest two points at $(2,1),(2,2)$ and $(4,3),(4,4)$ respectively.
+
+```{r}
+optimal_seper_classifier <- observations +
+  geom_abline(intercept = -.5, slope  = 1, col = "purple")
+optimal_seper_classifier
 ```
+
+c\)
+
+The equation of our optimal separating hyper-plane is $-.5 + 1 X_1 + 1 X_2=0$. So our classification rule is red if $-.5 + 1 X_1 + 1 X_2 > 0$ and blue if $-.5 + 1 X_1 + 1 X_2<0$.
+
+d\)
+
+```{r}
+optimal_seper_classifier +
+  annotate("segment", x = c(2,2,4,4), xend = c(1.75,2.25,3.75,4.25), 
+           y = c(1,2,3,4), yend = c(1.25,1.75,3.25,3.75)) +
+  geom_abline(intercept = c(-1,0), slope = c(1,1), linetype = 2)
+```
+
+e\)
+
+The support vectors are $(2,1),(2,2),(4,3),(4,4)$ .
+
+f\)
+
+The seventh observation is not a support vector, unless it is moved into the margin it will not change the maximal margin hyper-plane.
