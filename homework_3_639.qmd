@@ -35,7 +35,7 @@ The benefit of being unbiased can become a curse in many scenarios. As previousl
 
 A main drawback of the LOOCV approach is its computational intensity. As previously discussed the LOOCV approach fits a model n times. This makes it unrealistic for situations where a model is computationally taxing or n is large. K-fold cross-validation has a clear advantage in this area, the difference between fitting a model n times and 5 or 10 times (commonly selected values of k) is a world of difference computationally.
 
-2)
+2\)
 
 ```{r}
 #| include: false
@@ -72,3 +72,71 @@ boot(Default, boot.fn, 1000)
 d\)
 
 The standard errors obtained from the glm function and bootstrap function are very close to each other.
+
+3\)
+
+a\) iii. is correct. Least squares has zero bias if linear assumptions are met. The lasso introduces bias and is also a linear model, so it is less flexible. If the squared bias is less than the decrease in variance we would see improved predictions.
+
+b\) iii. is correct. Least squares has zero bias if linear assumptions are met. Ridge regression introduces bias and is also a linear model, so it is less flexible. If the squared bias is less than the decrease in variance we would see improved predictions.
+
+c\) ii. is correct. A non-linear method makes less assumptions about the form of the true function than a linear method, therefore it is more flexible. We would expect prediction accuracy to improve if the bias we reduced is more than the increase in variance.
+
+4\)
+
+a\) iv. Steadily decrease is correct. When s = 0 we have a null model with coefficients equal to zero. That is when bias is at its highest and variance is 0. As s increases the flexibility of the model is increased. Training RSS will decrease as flexibility increases, we are following the training data closer and heading towards the least squares estimate (which solely focuses on minimizes RSS).
+
+b\) ii. Decrease initially and then start increasing in a U shape is correct. . When s = 0 we have a null model with coefficients equal to zero. That is when bias is at its highest and variance is 0. As s increases the flexibility of the model is increased. Test RSS, similar to other test errors, will be minimized somewhere in the middle ground on the bias and variance trade-off. After that point the increased variance will outpace the reduction in bias and test RSS will increase.
+
+c\) iii. Steadily increase is correct. When s = 0 we have a null model with coefficients equal to zero. That is when bias is at its highest and variance is 0. As s increases the flexibility of the model is increased, naturally variance is also increased.
+
+d\) iv. Steadily decrease is correct. When s = 0 we have a null model with coefficients equal to zero. That is when bias is at its highest and variance is 0. As s increases the flexibility of the model is increased, naturally bias is decreasing.
+
+e\) v. Remain constant is correct. Irreducible error cannot, as the name suggests, be reduced through increasing the flexibility of a model.
+
+5\)
+
+a\)
+
+Splitting data and creating necessary objects for further steps.
+
+```{r}
+library(ISLR2)
+library(glmnet)
+
+x <- model.matrix(Apps ~ ., College)[, -1]
+y <- College$Apps
+
+set.seed(11)
+train <- sample(1:nrow(x), nrow(x) / 2)
+test <- (-train)
+y.test <- y[test]
+
+College_train <- College[train, ]
+College_test <- College[test, ]
+```
+
+b\)
+
+```{r}
+apps_lse <- lm(Apps ~ ., College[train, ])
+apps_lse_pred <- predict(apps_lse, College[test, ])
+mean((apps_lse_pred - y.test)^2)
+```
+
+The test MSE we end up with is 1026096.
+
+c\)
+
+```{r}
+cv.out_ridge <- cv.glmnet(x[train, ], y[train], alpha  = 0)
+plot(cv.out_ridge)
+```
+
+```{r}
+bestlam_ridge <- cv.out_ridge$lambda.min
+bestlam_ridge
+```
+
+```{r}
+apps_
+```
