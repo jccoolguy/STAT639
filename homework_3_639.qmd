@@ -183,3 +183,13 @@ apps_lasso_coef
 ```
 
 All coefficients are non-zero, this is due to the lambda chosen through cross validation being small.
+
+6\)
+
+a\)
+
+![](tree.PNG)
+
+b\)
+
+![](diagram.PNG)
