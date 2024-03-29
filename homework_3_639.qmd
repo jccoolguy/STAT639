@@ -132,11 +132,54 @@ cv.out_ridge <- cv.glmnet(x[train, ], y[train], alpha  = 0)
 plot(cv.out_ridge)
 ```
 
+Finding lambda corresponding to minimum cross validation error.
+
 ```{r}
 bestlam_ridge <- cv.out_ridge$lambda.min
 bestlam_ridge
 ```
 
+Calculating test error.
+
 ```{r}
-apps_
+apps_ridge <- glmnet(x[train, ], y[train], alpha = 0,
+                     lambda = bestlam_ridge)
+apps_ridge_pred <- predict(apps_ridge, newx = x[test, ])
+mean((apps_ridge_pred - y.test)^2)
 ```
+
+The test error we end up with is 970029.2, an improvement over least squares.
+
+d\)
+
+Finding lambda with lowest cross validation error.
+
+```{r}
+cv.out_lasso <- cv.glmnet(x[train, ], y[train], alpha = 1)
+plot(cv.out_lasso)
+```
+
+Grabbing lambda corresponding to lowest cross validation error.
+
+```{r}
+bestlam_lasso <- cv.out_lasso$lambda.min
+bestlam_lasso
+```
+
+Fitting lasso and predicting on test set.
+
+```{r}
+apps_lasso <- glmnet(x[train, ], y[train], alpha = 1,
+                     lambda = bestlam_lasso)
+apps_lasso_pred <- predict(apps_lasso, newx = x[test, ])
+mean((apps_lasso_pred - y.test)^2)
+```
+
+The test error for lasso is 1013435, in-between least squares ridge regression.
+
+```{r}
+apps_lasso_coef <- predict(apps_lasso, type = "coefficients")[1:18,]
+apps_lasso_coef
+```
+
+All coefficients are non-zero, this is due to the lambda chosen through cross validation being small.
