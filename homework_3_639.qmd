@@ -13,17 +13,17 @@ engine: knitr
 
 1\)
 
-a\) K-fold cross-validation is implemented by splitting the observed data into k non-overlapping sets with close to equal size, these resulting sets are called folds. For each step in the procedure a fold is kept out as a validation set. A chosen model is fit using the k-1 remaining folds and evaluated using the validation set. The evaluation criteria depends on the setting and objective. For instance a regression problem may utilize mean-squared error, while a classififcation problem may use the error rate. This procedure is done k times, with each of the k folds is used as a validation set once. The evaluation metric is then averaged and returned.
+a\) K-fold cross-validation is implemented by splitting the observed data into k non-overlapping sets with close to equal size called folds. For each step in the procedure a fold is kept out as a validation set. A chosen model is fit using the k-1 remaining folds and evaluated using the validation set. The evaluation criteria depends on the setting and objective. For instance a regression problem may utilize mean-squared error, while a classification problem may use the error rate. This procedure is done k times and each of the k folds is used as a validation set once. The evaluation metric is then averaged and returned.
 
 b\)
 
 i\) The k-fold cross-validation approach has notable advantages over the validation set approach.
 
-Firstly, the validation set approach struggles with the variability inherent to the selection of the held out set. For example consider 20% of the data is held out. There are instances where the selected 20% are on the higher end, where they are on the lower end, where outliers are selected and so on. If the same procedure was ran again results could be wildly different depending on the randomly selected validation set. The k-fold cross-validation approach on the other hand uses each K split as a validation set and averages the evaluation criteria. This reduces the variance of the approach in its estimate of test error.
+Firstly, the validation set approach struggles with the variability inherent to the selection of the held out set. For example consider 20% of the data is held out. There are instances where the selected 20% are on the higher end, where they are on the lower end, where outliers are selected and so on. If the same procedure was ran again results could be wildly different depending on the randomly selected validation set. The k-fold cross-validation approach on the other hand uses each of the k splits as a validation set and averages the evaluation criteria. This reduces the variance of the approach in its estimate of test error.
 
-Secondly, the validation set approach often overestimates the test error we would see if the entire data set was used to train. Continuing the previous example, only 80% of our observed data was utilized in training our model and 20% was held out. There is a balance between having enough data to adequately train the model and enough to adequately evaluate it. The K-fold cross-validation approach allows us to utilize all of the observed data to train the model and thus does not tend to overestimate the test error.
+Secondly, the validation set approach often overestimates the test error we would see if the entire data set was used to train. Continuing the previous example, only 80% of our observed data was utilized in training our model and 20% was held out. There is a balance between having enough data to adequately train the model and enough to adequately evaluate it. The k-fold cross-validation approach allows us to utilize all of the observed data to train the model and thus does not tend to overestimate the test error.
 
-The main disadvantage the k-fold cross-validation approach has is its increased computational requirement. With the validation set approach a model needs to be fit only one time, the K-fold cross validation approach requires it be fit k times. Depending on the computational complexity of a model this can be restrictive. But with a reasonable number k chosen, with complexity in mind, this disadvantage can be adjusted for. Additionally for many models the computational tax being paid is not too high.
+The main disadvantage the k-fold cross-validation approach has is its increased computational requirement. With the validation set approach a model needs to be fit only one time, the K-fold cross validation approach requires it be fit k times. Depending on the computational complexity of a model this can be restrictive. But with a reasonable number k chosen this disadvantage can be adjusted for. Additionally for many models the computational tax being paid is not too high.
 
 c\)
 
@@ -31,7 +31,7 @@ i\) The LOOCV approach is a special version of the K-fold cross validation appro
 
 The first strength of the LOOCV approach is its sensibility and thus its lack of bias in estimating test error. The LOOCV approach uses everything but one observation each time a model is fit and evaluates its performance on that one observation. This is repeated n times and the evaluation criteria is averaged out. It is similar to the actual process of seeing a new observation and attempting to estimate it, we are using all the other information possible to make our prediction. Therefore the estimate of test error is approximately unbiased.
 
-The benefit of being unbiased can become a curse in many scenarios. As previously discussed the trade-off between bias and variance is paramount for evaluating our prediction. The variance of the LOOCV approach is high due to the n fitted models all being very similar, therefore correlated, to each other. The average of highly correlated quantities has high variance compared to moderately correlated quantities. The k-fold-cross-validation approach strikes more of a middle ground between bias and variance. In many cases this is an advantage in its ability to estimate test error.
+The benefit of being unbiased can become a curse in many scenarios. The trade-off between bias and variance is a paramount decision for creating a prediction. The variance of the LOOCV approach is high due to the n fitted models all being very similar, therefore correlated, to each other. The average of highly correlated quantities has high variance compared to moderately correlated quantities. The k-fold-cross-validation approach strikes more of a middle ground between bias and variance. In many cases this is an advantage in its ability to estimate test error.
 
 A main drawback of the LOOCV approach is its computational intensity. As previously discussed the LOOCV approach fits a model n times. This makes it unrealistic for situations where a model is computationally taxing or n is large. K-fold cross-validation has a clear advantage in this area, the difference between fitting a model n times and 5 or 10 times (commonly selected values of k) is a world of difference computationally.
 
@@ -100,6 +100,7 @@ a\)
 Splitting data and creating necessary objects for further steps.
 
 ```{r}
+#|ooutput: false
 library(ISLR2)
 library(glmnet)
 
@@ -193,3 +194,17 @@ a\)
 b\)
 
 ![](diagram.PNG)
+
+7\)
+
+In the majority vote approach we have 6 votes for Red and 4 votes for Green. We would recommend Red.
+
+In the average probability approach we have the below:
+
+```{r}
+probs <- c(0.1,0.15,0.2,0.2,0.55,0.6,0.6,0.65,0.7,0.75)
+average_prob <- sum(probs)/length(probs)
+average_prob
+```
+
+The average probability, $P(\text{Class is Red}|X)$, is 0.45. So we would recommend Green.
